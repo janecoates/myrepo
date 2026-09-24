@@ -7,7 +7,7 @@ import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { openFilm, grab, ROOT } from './browser.mjs';
 
-const out = process.argv[2] || join(ROOT, 'out/limericki-summer-fun.mp4');
+const out = process.argv[2] || join(ROOT, 'out/limericki-find-your-fit.mp4');
 const fps = +(process.argv[3] || 30);
 const ffmpeg = process.env.FFMPEG || 'ffmpeg';
 mkdirSync(join(ROOT, 'out'), { recursive: true });

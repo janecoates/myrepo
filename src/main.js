@@ -17,7 +17,7 @@
   let actx = null, gain = null, buffer = null, source = null;
   let playing = false, offset = 0, startedAt = 0, perfStart = 0, muted = false;
   let started = false; // until first play, show the poster frame
-  const POSTER_T = 2.95;
+  const POSTER_T = 3.4;
   let soundtrack = null;
 
   // Adaptive resolution: if playback can't hold ~40 fps, render fewer pixels.
@@ -127,9 +127,8 @@
 
   async function boot() {
     await LR.loadFonts();
-    if (LR.preloadLogo) await LR.preloadLogo();
     LR.initTextures(ctx);
-    LR.buildCast();
+    await LR.loadSuits();
 
     if (exportMode) {
       document.body.classList.add('export');

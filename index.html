@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Lime Ricki — Summer Fun</title>
-<meta name="description" content="A 30-second hand-drawn collage animation for Lime Ricki full-coverage swimwear. Pure JavaScript: canvas visuals and a synthesized soundtrack.">
+<title>Lime Ricki — Find Your Fit</title>
+<meta name="description" content="A 30-second information video for Lime Ricki swimwear, built from the brand's own swimsuit drawings. Pure JavaScript: canvas visuals and a synthesized soundtrack.">
 <style>
   :root {
     --ink: #1d1a2b;
@@ -43,7 +43,7 @@
 <body>
 <main class="stage">
   <div class="frame">
-    <canvas id="film" width="1920" height="1080" aria-label="Lime Ricki summer fun animation"></canvas>
+    <canvas id="film" width="1920" height="1080" aria-label="Lime Ricki information video"></canvas>
     <div class="overlay" id="overlay">
       <button class="play-big" id="bigPlay" aria-label="Play with sound">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4l15 8-15 8z"/></svg>
@@ -58,7 +58,7 @@
     <span class="time" id="time">0:00.0 / 0:30</span>
     <button class="btn" id="muteBtn" aria-label="Mute"><svg viewBox="0 0 24 24" fill="currentColor" id="muteIcon"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
   </div>
-  <div class="credit"><span><b>Lime Ricki</b> · Summer Fun · 0:30</span><span>Space play/pause · R restart · M mute · ←/→ seek</span></div>
+  <div class="credit"><span><b>Lime Ricki</b> · Find Your Fit · 0:30 · <a href="v1-collage/index.html" style="color:inherit">v1 collage</a></span><span>Space play/pause · R restart · M mute · ←/→ seek</span></div>
 </main>
 
 <script src="src/core.js"></script>
@@ -66,17 +66,16 @@
 <script src="src/fonts.js"></script>
 <script src="src/draw.js"></script>
 <script src="src/patterns.js"></script>
-<script src="src/text.js"></script>
-<script src="src/figure.js"></script>
-<script src="src/props.js"></script>
-<script src="src/cast.js"></script>
+<script src="src/type.js"></script>
+<script src="src/logo.js"></script>
+<script src="src/suits.js"></script>
 <script src="src/film.js"></script>
-<script src="src/scenes/intro.js"></script>
-<script src="src/scenes/pool.js"></script>
-<script src="src/scenes/beach.js"></script>
-<script src="src/scenes/backyard.js"></script>
+<script src="src/scenes/hello.js"></script>
 <script src="src/scenes/mixmatch.js"></script>
-<script src="src/scenes/endcard.js"></script>
+<script src="src/scenes/details.js"></script>
+<script src="src/scenes/sizes.js"></script>
+<script src="src/scenes/why.js"></script>
+<script src="src/scenes/fit.js"></script>
 <script src="src/audio.js"></script>
 <script src="src/main.js"></script>
 </body>

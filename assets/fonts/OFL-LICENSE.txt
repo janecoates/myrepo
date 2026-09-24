@@ -1,5 +1,7 @@
 Fonts bundled with this project (all SIL Open Font License 1.1, via Fontsource / Google Fonts):
 
+- jost (v2 headings): Copyright 2020 The Jost Project Authors (https://github.com/indestructible-type/Jost)
+- poppins (v2 body): Copyright 2020 The Poppins Project Authors (https://github.com/itfoundry/Poppins)
 - shrikhand: Copyright (c) 2015 Jonny Pinhorn (jonpinhorn.typedesign@gmail.com)
 - caveat-brush: Copyright 2015 Google Inc. All Rights Reserved.
 - titan-one: Copyright (c) 2011 Rodrigo Fuenzalida (hello@rfuenzalida.com), with Reserved Font Name "Titan One"

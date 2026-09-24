@@ -184,7 +184,7 @@
         if (x > 0.026) e = Math.max(e, 0.75 * Math.exp(-(x - 0.026) * 20));
         s[i] *= e * 2.2;
       }
-      add(s, t, vel * 0.3, 0.08, 0.18);
+      add(s, t, vel * 0.2, 0.08, 0.2);
     }
     function snare(t, vel = 1) {
       const s = noise(Math.round(0.22 * SR), Math.round(t * 991));
@@ -245,6 +245,8 @@
     }
     const GLOCK = [[1, 1, 1.5], [2.756, 0.32, 0.45], [5.404, 0.12, 0.2], [8.933, 0.04, 0.1]];
     const MARIMBA = [[1, 1, 0.55], [3.93, 0.22, 0.14], [9.2, 0.05, 0.05]];
+    const VIBES = [[1, 1, 1.4], [3.99, 0.1, 0.35], [9.9, 0.025, 0.08]];
+    const vibes = (t, m, v = 1) => mallet(t, m, v * 0.2, VIBES, 0.1, 0.38, 1.3);
     const glock = (t, m, v = 1, pan = 0.25) => mallet(t, m, v * 0.13, GLOCK, pan, 0.35);
     const marimba = (t, m, v = 1, pan = -0.15) => mallet(t, m, v * 0.2, MARIMBA, pan, 0.18, 0.8);
 
@@ -511,10 +513,9 @@
       if (bar >= 6 && bar <= 12) for (const b of [1, 3]) tamb(T(bar, b), 1);
     }
     // snare fills into the mix & match section and into the end card
-    for (let k = 0; k < 4; k++) snare(T(10, 3 + k / 4), 0.5 + k * 0.17);
-    for (let k = 0; k < 6; k++) snare(T(12, 2.5 + k / 4), 0.45 + k * 0.11);
-    crash(26.0, 1);
-    kick(26.0, 1.1);
+    for (let k = 0; k < 4; k++) snare(T(9, 3 + k / 4), 0.35 + k * 0.12);
+    for (let k = 0; k < 4; k++) snare(T(12, 1 + k / 4), 0.35 + k * 0.12);
+    crash(25.0, 0.6);
     crash(28.0, 1.2);
     kick(28.0, 1.2);
 
@@ -533,7 +534,8 @@
     phrase(10, [[0, 84, 1.4], [1.5, 81, 0.5], [2, 79, 1.2]]);
     phrase(13, [[2.5, 88, 0.25], [2.75, 91, 0.25], [3, 93, 0.25], [3.5, 91, 0.5]]);
     phrase(14, [[0, 84, 2.6]]);
-    whistle(W, 0.1);
+    // played on a soft vibraphone an octave down (clean, not cartoony)
+    for (const n of W) vibes(n.t, n.m - 12, n.slur ? 0.75 : 0.95);
 
     // --- marimba riff for mix & match (bars 11–12) ---
     const ARP = { C: [60, 64, 67, 72], Am: [57, 60, 64, 69], F: [53, 57, 60, 65], G: [55, 59, 62, 67] };
@@ -548,68 +550,35 @@
     // a little marimba answer under the beach bars
     for (const [bar, beat, m] of [[5, 3, 79], [5, 3.5, 76], [6, 3.5, 72], [7, 3, 76], [7, 3.5, 79]]) marimba(T(bar, beat), m, 0.8, 0.3);
 
-    // ================= FOLEY CUES (synced to the picture) =================
+    // ================= SOUND CUES (synced to the picture) =================
+    // Deliberately light: paper swishes, soft taps and pitched chimes.
     const PENTA = [72, 74, 76, 79, 81, 84, 86, 88, 91, 93, 96];
-    // intro
-    [84, 88, 91, 96].forEach((m, i) => glock(0.12 + i * 0.045, m, 0.9));
-    whoosh(0.2, 0.5, 0.6, 500, 2400, -0.6);
-    whoosh(0.42, 0.5, 0.5, 500, 2400, 0.6);
-    whoosh(0.56, 0.5, 0.5, 450, 2200, -0.5);
-    slap(0.62, 0.45, -0.6); slap(0.84, 0.4, 0.6); slap(0.98, 0.4, -0.5);
-    'Hello,'.split('').forEach((c, i) => blipNote(0.5 + i * 0.05 + 0.06, PENTA[i], 0.8, -0.2));
-    'summer!'.split('').forEach((c, i) => blipNote(0.8 + i * 0.06 + 0.06, PENTA[i + 3], 0.9, 0.2));
-    [[1.25, -0.4], [1.4, 0], [1.55, 0.4]].forEach(([t, p], i) => { bubble(t + 0.05, 380 + i * 70, 1.4, p); pop(t + 0.1, 900, 420, 0.6, p); });
-    slap(1.72, 0.5, 0);
-    scribble(1.86, 0.75, 1);
-    blipNote(2.72, 91, 0.7, 0.3);
-    // intro → pool
-    tear(3.72, 0.55, 1);
-    // pool
-    for (let k = 0; k < 7; k++) thup(3.95 + k * 0.19, 0.35, -0.4 + k * 0.05);
-    boing(5.0, 185, 0.9);
-    boing(5.5, 150, 1.2);
-    whoosh(5.72, 0.45, 0.8, 600, 2600, 0);
-    slideWhistle(5.76, 0.5, 520, 1560, 1);
-    slideWhistle(6.36, 0.58, 1500, 430, 0.9);
-    splash(7.0, 1.1);
-    const rb = rng(9);
-    for (let k = 0; k < 14; k++) bubble(7.1 + rb() * 0.85, 420 + rb() * 700, 0.6 + rb() * 0.5, (rb() - 0.5) * 0.6);
-    'SPLOOSH!'.split('').forEach((c, i) => slap(7.04 + i * 0.055 + 0.05, 0.16, 0.4));
-    bubble(7.98, 520, 1.2, 0.1); pop(8.02, 1000, 400, 0.6, 0.1);
-    [84, 88, 91].forEach((m, i) => glock(8.08 + i * 0.07, m, 0.6, 0));
-    // pool → beach
-    tear(9.7, 0.6, 1);
-    ambience(9.8, 16.2, 'ocean', 0.16);
-    whoosh(10.0, 0.9, 0.7, 300, 1600, 0.5);
-    gull(10.55, 1); gull(10.95, 0.8); gull(12.6, 0.7);
-    whoosh(13.42, 0.55, 0.8, 500, 2600, 0);
-    slideWhistle(13.47, 0.26, 700, 1300, 0.55);
-    splash(14.0, 0.45);
-    [86, 91, 93].forEach((m, i) => glock(10.95 + i * 0.07, m, 0.6, 0));
-    // beach → yard
-    tear(15.7, 0.6, 1);
-    ambience(15.8, 22.1, 'spray', 0.03);
-    for (let k = 0; k < 6; k++) { thup(16.62 + k, 0.4, -0.3); thup(17.12 + k, 0.3, 0.3); }
-    squeak(18.9, 1); squeak(19.14, 0.8); squeak(21.1, 0.9);
-    [88, 91, 96].forEach((m, i) => glock(16.95 + i * 0.07, m, 0.6, 0));
-    // yard → mix & match (sheet slides in)
-    whoosh(21.72, 0.55, 1, 350, 2000, 0.6);
-    slap(22.0, 0.5, 0.3);
-    for (const [t, p] of [[22.15, -0.6], [22.3, 0.6], [23.2, -0.6]]) pop(t + 0.08, 1100, 520, 0.7, p);
-    for (const t of [22.62, 23.62, 24.62]) whoosh(t, 0.4, 0.6, 700, 3000, 0);
-    for (const t of [23.0, 24.0, 25.0]) { snip(t - 0.02, 1); glock(t + 0.02, 96, 0.5, 0); }
-    for (const [t, p] of [[22.4, -0.6], [23.4, 0.6], [24.4, -0.6], [25.15, 0.6]]) slap(t + 0.05, 0.75, p);
-    // mix → end card
-    tear(25.7, 0.6, 1);
-    // wordmark letters play a glock arpeggio
-    'LIMERICKI'.split('').forEach((c, i) => glock(26.12 + i * 0.075 + 0.07, PENTA[i + 1], 0.75, -0.3 + i * 0.07));
-    pop(27.0, 1000, 460, 0.5, -0.2); pop(27.4, 1200, 520, 0.5, 0.2);
-    slap(27.9, 0.5, 0);
-    scribble(27.98, 0.55, 0.9);
-    // final chord: party popper + sparkle
-    pop(28.0, 1800, 300, 1.2, 0);
-    [72, 76, 79, 84, 88, 91, 96].forEach((m, i) => glock(28.02 + i * 0.05, m, 0.7, -0.3 + i * 0.1));
-    tear(28.05, 0.7, 0.35);
+    const tap = (t, v = 1, p = 0) => slap(t, 0.22 * v, p);
+    const swish = (t, v = 1) => whoosh(t, 0.62, 0.5 * v, 300, 1700, 0.3);
+    // hello: suits pin up, logo writes on, rule draws
+    [0.55, 0.7, 0.85, 1.0, 1.15, 1.3].forEach((t, i) => tap(t + 0.05, 0.9, i % 2 ? 0.4 : -0.4));
+    [84, 88, 91, 93, 96].forEach((m, i) => glock(0.35 + i * 0.28, m, 0.55, -0.2 + i * 0.1));
+    blipNote(2.45, 88, 0.45, 0);
+    // page turns
+    for (const at of [4.0, 10.0, 16.0, 20.0, 25.0]) swish(at - 0.48, 1);
+    // mix & match: card lands, top & bottom drop in, swaps, matching set
+    tap(4.1, 0.7); tap(4.42, 0.9, 0.3); tap(4.57, 0.9, 0.3);
+    const MIX = [[5.5, 76], [6.0, 79], [6.5, 81], [7.0, 79], [7.5, 84], [8.0, 81], [8.5, 86], [8.75, 88]];
+    MIX.forEach(([t, m]) => { whoosh(t - 0.02, 0.3, 0.3, 900, 2600, 0.4); blipNote(t + 0.06, m, 0.5, 0.3); });
+    [88, 91, 96].forEach((m, i) => glock(8.9 + i * 0.08, m, 0.55, 0.3));
+    // the details: each callout dot
+    [11.0, 12.0, 13.0, 14.0].forEach((t, i) => blipNote(t + 0.03, [79, 81, 84, 86][i], 0.6, i % 2 ? -0.3 : 0.3));
+    tap(10.1, 0.8);
+    // sizes: the chips play up the scale
+    for (let i = 0; i < 9; i++) blipNote(16.8 + i * 0.22 + 0.05, PENTA[i + 1], 0.55, -0.4 + i * 0.1);
+    tap(16.25, 0.7, -0.5); tap(16.4, 0.7, 0.5);
+    // why: three cards
+    [20.5, 21.1, 21.7].forEach((t, i) => { tap(t + 0.08, 0.8, (i - 1) * 0.4); glock(t + 0.3, [84, 88, 91][i], 0.35, (i - 1) * 0.4); });
+    // find your fit: suits line up, logo writes on, final chord sparkle
+    for (let i = 0; i < 7; i++) tap(25.25 + i * 0.1 + 0.12, 0.6, -0.45 + i * 0.15);
+    [79, 84, 88, 91].forEach((m, i) => glock(26.0 + i * 0.3, m, 0.45, 0));
+    blipNote(27.25, 84, 0.45, 0);
+    [72, 76, 79, 84, 88, 91, 96].forEach((m, i) => glock(28.02 + i * 0.05, m, 0.6, -0.3 + i * 0.1));
 
     // ================= MASTER =================
     // Freeverb-style reverb on the send bus
