@@ -1,0 +1,15 @@
+{
+  "name": "limericki-summer-fun",
+  "version": "1.0.0",
+  "private": true,
+  "description": "30-second hand-drawn collage animation for Lime Ricki — pure JavaScript canvas + synthesized audio.",
+  "scripts": {
+    "stills": "node tools/stills.mjs",
+    "audio": "node tools/render-audio.mjs",
+    "video": "node tools/render-video.mjs",
+    "fonts": "node tools/embed-fonts.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.55.0"
+  }
+}
