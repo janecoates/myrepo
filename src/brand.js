@@ -32,7 +32,7 @@
       whyKicker: '04',
       why: 'Why Lime Ricki',
       pillars: [
-        ['Women owned', 'Designing swimsuits for women, by women for over 18 years.'],
+        ['18+ years of swim', 'Designing swimsuits for women for over 18 years.'],
         ['Responsibly made', 'High-quality swim made in small batches and sewn to last.'],
         ['Designed in the USA', 'Based in Salt Lake City, where we design and ship every suit.'],
       ],

@@ -3,7 +3,7 @@
  *   4 – 10  01 Mix & Match   tops and bottoms swap on the beat → matching set
  *  10 – 16  02 The Details   callouts on a shoulder-tie one-piece
  *  16 – 20  03 XXS – 4X      the size run
- *  20 – 25  04 Why Lime Ricki   women owned · responsibly made · designed in USA
+ *  20 – 25  04 Why Lime Ricki   18+ years of swim · responsibly made · designed in USA
  *  25 – 30  Find your fit    the collection lines up under the logo
  * Scenes change with a clean paper-sheet slide on the downbeat; a dashed
  * "cut here" frame (from the illustration artboards) holds it all together. */

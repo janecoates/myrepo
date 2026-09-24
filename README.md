@@ -16,14 +16,14 @@ A clean, 30-second information video about what makes Lime Ricki unique. It's bu
 | 0:04–0:10 | **01 Mix & Match** (paper) | *Tops, bottoms & one-pieces designed to play together.* · *5 tops × 5 bottoms = 25 looks* · *…or wear the matching set* | Tops and bottoms swap on the beat through combinations, landing on the bouquet set. | Card swishes, each swap a pitched chime |
 | 0:10–0:16 | **02 The Details** (blush) | Callouts on the cherry shoulder-tie one-piece: *Adjustable shoulder ties*, *Built-in shelf bra (double-lined, sewn-in pads)*, *UPF 50+ fabric (80% nylon, 20% spandex)*, *Mastectomy friendly (select one-piece styles)* | Leader lines draw out one per bar. | A soft chime per callout |
 | 0:16–0:20 | **03 XXS – 4X** (periwinkle) | *Inclusive sizing for every body, designed so you can feel your best.* | Nine size chips pop in on eighth notes. | The chips play up the scale |
-| 0:20–0:25 | **04 Why Lime Ricki** (cream) | *Women owned* · *Responsibly made* · *Designed in the USA* | Three cards; their line icons draw themselves. | Taps and chimes |
+| 0:20–0:25 | **04 Why Lime Ricki** (cream) | *18+ years of swim* · *Responsibly made* · *Designed in the USA* | Three cards; their line icons draw themselves. | Taps and chimes |
 | 0:25–0:30 | **Find your fit** (petal pink) | White script logo · *FIND YOUR FIT* · *limericki.com* | The one-piece collection lines up under the logo; sparkles land on the final chord. | Logo arpeggio; the final chord rings out |
 
 ## Sources for every claim
 
 All copy is quoted or lightly condensed from limericki.com:
 
-- **Home page:** "Full Coverage Swimwear". "Find cute, stylish, full-coverage swimwear". "For over 18 years, we've been designing swimsuits for women, by women." "High-quality swim produced in small batches and sewn to last." "Sizes XXS – 4X: Inclusive sizing for every body, designed so you can feel your best." "Lime Ricki is based in Salt Lake City, where we design and ship every suit."
+- **Home page:** "Full Coverage Swimwear". "Find cute, stylish, full-coverage swimwear". "For over 18 years, we've been designing swimsuits for women…" "High-quality swim produced in small batches and sewn to last." "Sizes XXS – 4X: Inclusive sizing for every body, designed so you can feel your best." "Lime Ricki is based in Salt Lake City, where we design and ship every suit."
 - **Product pages** (e.g. Field Study Shoulder-Tie One-Piece, Sky Gingham High-Waist Bottom): "Adjustable tie-shoulder straps… create the perfect amount of support", "Double lined shelf bra with sewn-in bra pads", "UPF 50+ sun protection", "80% nylon, 20% spandex", "Mastectomy friendly", and "Mix and match this versatile swim skirt with all your favorite tops".
 - **Needs review:** "Mastectomy friendly" appears on the one-piece listings. It's captioned "select one-piece styles", so please confirm that framing. The counts in *5 tops × 5 bottoms = 25 looks* refer to the pieces shown on screen.
 
