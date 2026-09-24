@@ -23,7 +23,7 @@ const ff = spawn(ffmpeg, [
   '-y', '-loglevel', 'error',
   '-f', 'image2pipe', '-framerate', String(fps), '-c:v', 'mjpeg', '-i', '-',
   '-i', wav,
-  '-c:v', 'libx264', '-preset', 'slow', '-crf', '21', '-pix_fmt', 'yuv420p', '-tune', 'animation',
+  '-c:v', 'libx264', '-preset', 'slow', '-b:v', '6M', '-maxrate', '9M', '-bufsize', '12M', '-pix_fmt', 'yuv420p',
   '-c:a', 'aac', '-b:a', '192k',
   '-movflags', '+faststart', '-t', String(duration),
   out,
