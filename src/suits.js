@@ -46,7 +46,7 @@
     })));
   };
 
-  // Draw a suit sticker centred at (x, y). o: {scale, rot, alpha, shadow, sway: seed}
+  // Draw a suit sticker centred at (x, y). o: {scale, sx (horizontal squash), rot, alpha, shadow, sway: seed}
   LR.drawSuit = function (ctx, name, x, y, o = {}) {
     const S = LR.SUITS[name];
     if (!S) return;
@@ -61,7 +61,7 @@
     if (o.alpha != null) ctx.globalAlpha *= o.alpha;
     ctx.translate(x, y + dy);
     ctx.rotate(rot);
-    ctx.scale(sc, sc);
+    ctx.scale(sc * (o.sx == null ? 1 : o.sx), sc);
     LR.setShadow(ctx, o.shadow === undefined ? { blur: 22, x: 4, y: 12, a: 0.2 } : o.shadow);
     ctx.drawImage(S.canvas, -S.w / 2, -S.h / 2);
     ctx.restore();

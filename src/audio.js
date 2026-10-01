@@ -15,7 +15,8 @@
 (function (root) {
   const LR = (root.LR = root.LR || {});
 
-  LR.renderSoundtrack = function (SR = 48000) {
+  // variant: 'summer' (default, the Find Your Fit cut) or 'fall'
+  LR.renderSoundtrack = function (SR = 48000, variant = 'summer') {
     const DUR = 30, BEAT = 0.5;
     const N = Math.ceil(DUR * SR);
     const L = new Float32Array(N), R = new Float32Array(N), SEND = new Float32Array(N);
@@ -448,137 +449,284 @@
       add(s, t, vel * 0.045, 0.5, 0.4);
     }
 
-    // ================= ARRANGEMENT =================
-    // chord per half bar (bar, beat, chord)
-    const CH = [
-      [0, 0, 'C'], [1, 0, 'G7'],
-      [2, 0, 'C'], [3, 0, 'Am'], [4, 0, 'F'], [5, 0, 'G7'],
-      [6, 0, 'C'], [7, 0, 'Am'], [8, 0, 'F'], [9, 0, 'G7'],
-      [10, 0, 'F'], [10, 2, 'G7'],
-      [11, 0, 'C'], [11, 2, 'Am'], [12, 0, 'F'], [12, 2, 'G'],
-      [13, 0, 'C'], [13, 2, 'F'], [13, 3, 'G'],
-      [14, 0, 'C'],
-    ];
-    const chordAt = (bar, beat) => {
-      let c = 'C';
-      for (const [b, be, ch] of CH) if (b < bar || (b === bar && be <= beat)) c = ch;
-      return c;
-    };
+    function arrangeSummer() {
+      // ================= ARRANGEMENT =================
+      // chord per half bar (bar, beat, chord)
+      const CH = [
+        [0, 0, 'C'], [1, 0, 'G7'],
+        [2, 0, 'C'], [3, 0, 'Am'], [4, 0, 'F'], [5, 0, 'G7'],
+        [6, 0, 'C'], [7, 0, 'Am'], [8, 0, 'F'], [9, 0, 'G7'],
+        [10, 0, 'F'], [10, 2, 'G7'],
+        [11, 0, 'C'], [11, 2, 'Am'], [12, 0, 'F'], [12, 2, 'G'],
+        [13, 0, 'C'], [13, 2, 'F'], [13, 3, 'G'],
+        [14, 0, 'C'],
+      ];
+      const chordAt = (bar, beat) => {
+        let c = 'C';
+        for (const [b, be, ch] of CH) if (b < bar || (b === bar && be <= beat)) c = ch;
+        return c;
+      };
 
-    // --- ukulele ---
-    const strums = [];
-    for (let bar = 0; bar < 14; bar++) {
-      for (const [beat, dir, v] of STRUM) {
-        if (bar === 13 && beat > 0 && beat < 2.5) continue; // leave room for the logo "ta-da"
-        strums.push({ t: T(bar, beat), chord: chordAt(bar, beat), dir, v: v * (bar === 0 ? 0.8 : 1) });
+      // --- ukulele ---
+      const strums = [];
+      for (let bar = 0; bar < 14; bar++) {
+        for (const [beat, dir, v] of STRUM) {
+          if (bar === 13 && beat > 0 && beat < 2.5) continue; // leave room for the logo "ta-da"
+          strums.push({ t: T(bar, beat), chord: chordAt(bar, beat), dir, v: v * (bar === 0 ? 0.8 : 1) });
+        }
       }
+      strums.push({ t: T(14, 0), chord: 'C', dir: 'D', v: 1.15, last: true });
+      strums.forEach((s, i) => {
+        const next = strums[i + 1];
+        const dur = s.last ? 1.8 : next.t - s.t;
+        strum(s.t, s.chord, s.dir, s.v, dur);
+      });
+      // a slow flourish on the final chord
+      [0.18, 0.36].forEach((o, i) => strum(T(14, 0) + o, 'C', 'D', 0.4 - i * 0.12, 1.5));
+
+      // --- bass ---
+      for (let bar = 0; bar < 14; bar++) {
+        for (const [beat, which, d, v] of [[0, 'r', 0.9, 1], [1.5, 'r', 0.35, 0.7], [2, '5', 0.9, 0.9], [3.5, 'o', 0.35, 0.7]]) {
+          if (bar === 13 && beat > 0 && beat < 2) continue;
+          const c = chordAt(bar, beat);
+          let m = ROOT[c];
+          if (which === '5') m += 7;
+          if (which === 'o') m += 12;
+          if (m > 55) m -= 12;
+          bass(T(bar, beat), m, d, v);
+        }
+      }
+      bass(T(14, 0), 36, 1.6, 1.1);
+
+      // --- drums ---
+      for (let bar = 0; bar < 14; bar++) {
+        const full = bar >= 1;
+        for (let b = 0; b < 4; b++) {
+          if (bar === 13 && b === 1) continue;
+          if ((b === 0 || b === 2) && (full || b === 2)) kick(T(bar, b), b === 0 ? 1 : 0.85);
+          if ((b === 1 || b === 3) && full) clap(T(bar, b), 1);
+        }
+        if (full && bar % 2 === 1) kick(T(bar, 3.5), 0.55);
+        // shaker 16ths with accents on the off-beats
+        for (let k = 0; k < 16; k++) {
+          const beat = k / 4;
+          shaker(T(bar, beat), (k % 2 ? 1 : 0.55) * (full ? 1 : 0.7));
+        }
+        if (bar >= 6 && bar <= 12) for (const b of [1, 3]) tamb(T(bar, b), 1);
+      }
+      // snare fills into the mix & match section and into the end card
+      for (let k = 0; k < 4; k++) snare(T(9, 3 + k / 4), 0.35 + k * 0.12);
+      for (let k = 0; k < 4; k++) snare(T(12, 1 + k / 4), 0.35 + k * 0.12);
+      crash(25.0, 0.6);
+      crash(28.0, 1.2);
+      kick(28.0, 1.2);
+
+      // --- whistle hook ---
+      const W = [];
+      const phrase = (bar, list) => list.forEach(([beat, m, d, slur]) => W.push({ t: T(bar, beat), m, d: d * BEAT * 0.94, slur }));
+      phrase(1, [[3, 79, 0.5], [3.5, 83, 0.5]]); // pickup
+      phrase(2, [[0, 88, 0.75], [0.75, 86, 0.25, 1], [1, 84, 0.5], [1.5, 88, 0.5], [2, 91, 1.5]]);
+      phrase(3, [[0, 93, 0.5], [0.5, 91, 0.5, 1], [1, 88, 0.5], [1.5, 84, 1.2], [3, 88, 0.5], [3.5, 86, 0.5]]);
+      phrase(4, [[0, 84, 0.5], [0.5, 81, 0.5], [1, 84, 0.5], [1.5, 89, 1.0], [2.5, 88, 0.5, 1], [3, 86, 1]]);
+      phrase(5, [[0, 83, 0.5], [0.5, 86, 0.5], [1, 91, 1.4], [2.5, 89, 0.5], [3, 86, 0.5, 1], [3.5, 83, 0.5]]);
+      phrase(6, [[0, 84, 0.5], [0.5, 88, 0.5], [1, 91, 1.0], [2, 93, 0.5], [2.5, 91, 0.5, 1], [3, 88, 1]]);
+      phrase(7, [[0, 84, 0.5], [0.5, 88, 0.5], [1, 93, 1.4], [2.5, 91, 0.5], [3, 88, 0.5, 1], [3.5, 84, 0.5]]);
+      phrase(8, [[0, 89, 0.5], [0.5, 88, 0.5, 1], [1, 86, 0.5], [1.5, 84, 0.5], [2, 81, 1.0], [3, 84, 0.5], [3.5, 86, 0.5]]);
+      phrase(9, [[0, 86, 1.0], [1, 79, 0.5], [1.5, 83, 0.5], [2, 86, 0.5], [2.5, 89, 0.5], [3, 88, 0.5, 1], [3.5, 86, 0.5]]);
+      phrase(10, [[0, 84, 1.4], [1.5, 81, 0.5], [2, 79, 1.2]]);
+      phrase(13, [[2.5, 88, 0.25], [2.75, 91, 0.25], [3, 93, 0.25], [3.5, 91, 0.5]]);
+      phrase(14, [[0, 84, 2.6]]);
+      // played on a soft vibraphone an octave down (clean, not cartoony)
+      for (const n of W) vibes(n.t, n.m - 12, n.slur ? 0.75 : 0.95);
+
+      // --- marimba riff for mix & match (bars 11–12) ---
+      const ARP = { C: [60, 64, 67, 72], Am: [57, 60, 64, 69], F: [53, 57, 60, 65], G: [55, 59, 62, 67] };
+      for (let bar = 11; bar <= 12; bar++) {
+        for (let k = 0; k < 8; k++) {
+          const beat = k / 2, c = chordAt(bar, beat);
+          const notes = ARP[c] || ARP.C;
+          const m = notes[[0, 2, 1, 3, 2, 1, 3, 2][k]] + 12;
+          marimba(T(bar, beat), m, k % 2 ? 0.7 : 1);
+        }
+      }
+      // a little marimba answer under the beach bars
+      for (const [bar, beat, m] of [[5, 3, 79], [5, 3.5, 76], [6, 3.5, 72], [7, 3, 76], [7, 3.5, 79]]) marimba(T(bar, beat), m, 0.8, 0.3);
+
+      // ================= SOUND CUES (synced to the picture) =================
+      // Deliberately light: paper swishes, soft taps and pitched chimes.
+      const PENTA = [72, 74, 76, 79, 81, 84, 86, 88, 91, 93, 96];
+      const tap = (t, v = 1, p = 0) => slap(t, 0.22 * v, p);
+      const swish = (t, v = 1) => whoosh(t, 0.62, 0.5 * v, 300, 1700, 0.3);
+      // hello: suits pin up, logo writes on, rule draws
+      [0.55, 0.7, 0.85, 1.0, 1.15, 1.3].forEach((t, i) => tap(t + 0.05, 0.9, i % 2 ? 0.4 : -0.4));
+      [84, 88, 91, 93, 96].forEach((m, i) => glock(0.35 + i * 0.28, m, 0.55, -0.2 + i * 0.1));
+      blipNote(2.45, 88, 0.45, 0);
+      // page turns
+      for (const at of [4.0, 10.0, 16.0, 20.0, 25.0]) swish(at - 0.48, 1);
+      // mix & match: card lands, top & bottom drop in, swaps, matching set
+      tap(4.1, 0.7); tap(4.42, 0.9, 0.3); tap(4.57, 0.9, 0.3);
+      const MIX = [[5.5, 76], [6.0, 79], [6.5, 81], [7.0, 79], [7.5, 84], [8.0, 81], [8.5, 86], [8.75, 88]];
+      MIX.forEach(([t, m]) => { whoosh(t - 0.02, 0.3, 0.3, 900, 2600, 0.4); blipNote(t + 0.06, m, 0.5, 0.3); });
+      [88, 91, 96].forEach((m, i) => glock(8.9 + i * 0.08, m, 0.55, 0.3));
+      // the details: each callout dot
+      [11.0, 12.0, 13.0, 14.0].forEach((t, i) => blipNote(t + 0.03, [79, 81, 84, 86][i], 0.6, i % 2 ? -0.3 : 0.3));
+      tap(10.1, 0.8);
+      // sizes: the chips play up the scale
+      for (let i = 0; i < 9; i++) blipNote(16.8 + i * 0.22 + 0.05, PENTA[i + 1], 0.55, -0.4 + i * 0.1);
+      tap(16.25, 0.7, -0.5); tap(16.4, 0.7, 0.5);
+      // why: three cards
+      [20.5, 21.1, 21.7].forEach((t, i) => { tap(t + 0.08, 0.8, (i - 1) * 0.4); glock(t + 0.3, [84, 88, 91][i], 0.35, (i - 1) * 0.4); });
+      // find your fit: suits line up, logo writes on, final chord sparkle
+      for (let i = 0; i < 7; i++) tap(25.25 + i * 0.1 + 0.12, 0.6, -0.45 + i * 0.15);
+      [79, 84, 88, 91].forEach((m, i) => glock(26.0 + i * 0.3, m, 0.45, 0));
+      blipNote(27.25, 84, 0.45, 0);
+      [72, 76, 79, 84, 88, 91, 96].forEach((m, i) => glock(28.02 + i * 0.05, m, 0.6, -0.3 + i * 0.1));
     }
-    strums.push({ t: T(14, 0), chord: 'C', dir: 'D', v: 1.15, last: true });
-    strums.forEach((s, i) => {
-      const next = strums[i + 1];
-      const dur = s.last ? 1.8 : next.t - s.t;
-      strum(s.t, s.chord, s.dir, s.v, dur);
-    });
-    // a slow flourish on the final chord
-    [0.18, 0.36].forEach((o, i) => strum(T(14, 0) + o, 'C', 'D', 0.4 - i * 0.12, 1.5));
 
-    // --- bass ---
-    for (let bar = 0; bar < 14; bar++) {
-      for (const [beat, which, d, v] of [[0, 'r', 0.9, 1], [1.5, 'r', 0.35, 0.7], [2, '5', 0.9, 0.9], [3.5, 'o', 0.35, 0.7]]) {
-        if (bar === 13 && beat > 0 && beat < 2) continue;
-        const c = chordAt(bar, beat);
-        let m = ROOT[c];
-        if (which === '5') m += 7;
-        if (which === 'o') m += 12;
-        if (m > 55) m -= 12;
-        bass(T(bar, beat), m, d, v);
+    // ================= FALL EDITION =================
+    // Cosy indie-folk: fingerpicked guitar (Karplus–Strong), upright-ish bass,
+    // brushed half-time kit, a celesta melody, leaf-rustle gusts and wind.
+    function arrangeFall() {
+      const CH = ['Am', 'F', 'C', 'G', 'Am', 'F', 'C', 'G', 'Am', 'F', 'C', 'G', 'F', 'G', 'C'];
+      const chordAtF = (bar, beat) => (bar === 1 ? (beat < 2 ? 'F' : 'G') : CH[Math.min(14, bar)]);
+      const VOICE = {
+        Am: [45, 52, 57, 60, 64], F: [41, 48, 53, 57, 60], C: [48, 52, 55, 60, 64], G: [43, 50, 55, 59, 62],
+      };
+      const ROOTF = { Am: 45, F: 41, C: 48, G: 43 };
+      const GUIT = 0.23;
+      function pick(t, midi, vel, dur, pan = -0.18) {
+        const src = ks(midi, Math.round(t * 13) % 3);
+        const n = Math.min(src.length, Math.round(dur * SR));
+        const s = src.slice(0, n);
+        const fade = Math.min(n, Math.round(0.05 * SR));
+        for (let i = 0; i < fade; i++) s[n - 1 - i] *= i / fade;
+        add(s, t, vel * GUIT, pan, 0.22);
       }
+      const CELESTA = [[1, 1, 1.3], [2, 0.18, 0.4], [4, 0.05, 0.12]];
+      const celesta = (t, m, v = 1) => mallet(t, m, v * 0.17, CELESTA, 0.15, 0.42, 1.4);
+      function brush(t, vel = 1) {
+        const s = noise(Math.round(0.3 * SR), Math.round(t * 887));
+        filt(s, 'bp', 2600, 0.6);
+        for (let i = 0; i < s.length; i++) { const x = i / SR; s[i] *= Math.min(1, x / 0.025) * Math.exp(-x * 13) * 1.6; }
+        add(s, t, vel * 0.16, 0.12, 0.2);
+      }
+      function rustle(t, dur, vel = 1, pan = 0) {
+        const n = Math.round(dur * SR), s = new Float32Array(n), r = rng(Math.round(t * 401));
+        for (let i = 0; i < n; i++) {
+          const k = i / n, dens = 500 + 2200 * Math.sin(k * Math.PI);
+          s[i] = (r() < dens / SR ? (r() * 2 - 1) * (0.4 + r()) : 0) + (r() * 2 - 1) * 0.05;
+        }
+        filt(s, 'bp', 2300, 0.5); filt(s, 'hp', 900, 0.7);
+        for (let i = 0; i < n; i++) s[i] *= Math.pow(Math.sin((i / n) * Math.PI), 0.8) * 2.6;
+        add(s, t, vel * 0.22, pan, 0.15);
+      }
+      function wood(t, vel = 1, pan = 0) {
+        const s = buf(0.06), r = rng(Math.round(t * 977));
+        let ph = 0;
+        for (let i = 0; i < s.length; i++) { const x = i / SR; ph += (TAU * 1850) / SR; s[i] = Math.sin(ph) * Math.exp(-x * 120) + (r() * 2 - 1) * 0.4 * Math.exp(-x * 600); }
+        add(s, t, vel * 0.16, pan, 0.1);
+      }
+      function wind(t0, t1, vel) {
+        const n = Math.round((t1 - t0) * SR), s = new Float32Array(n), r = rng(808);
+        let b = 0;
+        for (let i = 0; i < n; i++) {
+          const x = i / SR, fade = Math.min(1, x / 1.2, (t1 - t0 - x) / 1.2);
+          b = b * 0.97 + (r() * 2 - 1) * 0.2;
+          s[i] = b * (0.5 + 0.5 * Math.sin(TAU * 0.11 * x + 1) * Math.sin(TAU * 0.07 * x)) * fade;
+        }
+        filt(s, 'bp', 700, 0.5);
+        add(s, t0, vel, -0.2, 0.1);
+      }
+
+      // --- guitar: travis-ish fingerpicking in eighths ---
+      const PAT = [0, 3, 2, 4, 1, 3, 2, 4];
+      for (let bar = 0; bar < 14; bar++) {
+        for (let k = 0; k < 8; k++) {
+          const beat = k / 2, c = chordAtF(bar, beat), v = VOICE[c];
+          const bassNote = k === 0 || k === 4;
+          pick(T(bar, beat), v[PAT[k]], (bassNote ? 0.95 : 0.6) * (bar === 0 ? 0.85 : 1) * (0.9 + R0() * 0.2), 1.3);
+        }
+      }
+      // final chord, rolled
+      VOICE.C.forEach((m, i) => pick(28.0 + i * 0.035, m, 0.85, 1.9));
+      // --- bass ---
+      for (let bar = 0; bar < 14; bar++) {
+        const c = chordAtF(bar, 0);
+        bass(T(bar, 0), ROOTF[c], 1.3, bar === 0 ? 0.55 : 0.75);
+        bass(T(bar, 3), ROOTF[chordAtF(bar, 3)] + 7, 0.4, 0.45);
+      }
+      bass(28.0, 36, 1.6, 0.9);
+      // --- brushed half-time kit ---
+      for (let bar = 2; bar < 14; bar++) {
+        kick(T(bar, 0), 0.62);
+        if (bar % 2) kick(T(bar, 2.5), 0.35);
+        brush(T(bar, 2), 1);
+        for (let k = 0; k < 8; k++) shaker(T(bar, k / 2), k % 2 ? 0.55 : 0.3);
+      }
+      kick(28.0, 0.8);
+      crash(28.0, 0.35);
+      // --- celesta melody ---
+      const MEL = {
+        // a little falling-leaf motif under "Summer's over."
+        0: [[0.5, 81, 0.5], [1, 76, 0.5], [1.5, 72, 0.5], [2, 69, 1.5]],
+        1: [[0, 77, 0.5], [0.5, 76, 0.5], [1, 72, 0.75]],
+        2: [[0, 76, 0.5], [0.5, 79, 0.5], [1, 81, 1], [2, 79, 0.5], [2.5, 76, 0.5], [3, 74, 1]],
+        3: [[0, 74, 0.5], [0.5, 76, 0.5], [1, 79, 1.5], [3, 71, 0.5], [3.5, 74, 0.5]],
+        4: [[0, 72, 0.5], [0.5, 76, 0.5], [1, 81, 1], [2, 83, 0.5], [2.5, 81, 0.5], [3, 76, 1]],
+        5: [[0, 77, 0.5], [0.5, 76, 0.5], [1, 72, 1.5], [3, 69, 0.5], [3.5, 72, 0.5]],
+        6: [[0, 76, 0.5], [0.5, 79, 0.5], [1, 84, 1], [2, 83, 0.5], [2.5, 79, 0.5], [3, 76, 1]],
+        7: [[0, 74, 1], [1, 71, 0.5], [1.5, 74, 0.5], [2, 79, 2]],
+        8: [[0, 81, 0.5], [0.5, 79, 0.5], [1, 76, 1], [2, 72, 0.5], [2.5, 76, 0.5], [3, 81, 1]],
+        9: [[0, 79, 1], [1, 77, 0.5], [1.5, 76, 0.5], [2, 72, 2]],
+        12: [[0, 77, 0.5], [0.5, 81, 0.5], [1, 84, 1.5], [3, 81, 0.5], [3.5, 77, 0.5]],
+        13: [[0, 83, 1], [1, 79, 0.5], [1.5, 74, 0.5], [2, 79, 1], [3, 74, 0.5], [3.5, 79, 0.5]],
+      };
+      for (const bar in MEL) for (const [beat, m] of MEL[bar]) celesta(T(+bar, beat), m, 0.9);
+      celesta(28.0, 84, 1.1);
+      // clothesline bars: a light glock arpeggio
+      for (let bar = 10; bar <= 11; bar++) [0, 1, 2, 3].forEach((b) => glock(T(bar, b), [72, 76, 79, 84][b] + (bar === 11 ? -1 : 0), 0.35, 0.3));
+
+      // ================= FALL SOUND CUES (synced to the picture) =================
+      wind(0, 30, 0.05);
+      // suits flutter down & land
+      [[0.25, -0.4], [0.55, 0.4], [0.85, 0.5], [1.15, 0]].forEach(([t0, p]) => { rustle(t0 + 0.15, 1.1, 0.35, p); slap(t0 + 1.55, 0.25, p); });
+      scribble(2.2, 0.42, 1.1);
+      [72, 76, 79, 84].forEach((m, i) => glock(2.6 + i * 0.07, m, 0.5, 0));
+      scribble(2.65, 0.65, 0.8);
+      scribble(3.4, 0.45, 0.6);
+      // every scene change: a gust of leaves
+      for (const at of [5.0, 11.0, 17.0, 22.0, 26.0]) { rustle(at - 0.55, 1.0, 1, 0); whoosh(at - 0.5, 0.9, 0.45, 250, 1500, 0); }
+      // packing list
+      scribble(5.15, 0.55, 0.8); scribble(5.6, 0.35, 0.6);
+      [5.6, 6.4, 7.2, 8.0].forEach((t0, i) => { scribble(t0, 0.4, 0.7); scribble(t0 + 0.45, 0.14, 1); blipNote(t0 + 0.55, [79, 81, 84, 86][i], 0.45, -0.2); });
+      thup(6.07, 0.7, -0.4); thup(6.87, 0.7, -0.1);
+      slap(7.67, 0.45, 0.4); glock(7.72, 88, 0.45, 0.4);
+      scribble(8.7, 0.55, 0.7); scribble(9.2, 0.35, 0.6);
+      // postcard
+      whoosh(10.9, 0.55, 0.6, 300, 1600, 0);
+      ambience(12.2, 16.8, 'spray', 0.015);
+      scribble(12.3, 0.5, 0.6);
+      slap(12.62, 0.3, 0); slap(12.92, 0.3, 0);
+      slap(13.62, 0.55, 0.4);
+      thup(14.2, 0.75, 0.3); slap(14.21, 0.35, 0.3);
+      // clothesline
+      whoosh(17.2, 0.5, 0.3, 600, 2200, 0);
+      [17.45, 17.6, 17.75, 17.95, 18.1, 18.25].forEach((t0, i) => wood(t0 + 0.42, 1, (i % 3 - 1) * 0.5));
+      [19.0, 19.35, 19.7].forEach((t0, i) => { whoosh(t0, 0.25, 0.25, 1200, 3000, (i - 1) * 0.5); blipNote(t0 + 0.12, [76, 79, 81][i], 0.35, (i - 1) * 0.5); });
+      whoosh(20.45, 0.5, 0.35, 1800, 500, 0); wood(20.65, 1, 0); glock(20.7, 88, 0.5, 0);
+      // facts: leaves settle
+      [22.3, 22.8, 23.3].forEach((t0, i) => { rustle(t0, 1.0, 0.45, (i - 1) * 0.4); glock(t0 + 0.95, [79, 84, 88][i], 0.5, (i - 1) * 0.4); });
+      // end
+      scribble(26.3, 0.7, 0.6);
+      [79, 84, 88, 91].forEach((m, i) => glock(26.65 + i * 0.27, m, 0.42, 0));
+      for (let i = 0; i < 5; i++) slap(26.25 + i * 0.09 + 0.15, 0.18, (i - 2) * 0.3);
+      blipNote(27.65, 84, 0.4, 0);
+      rustle(27.9, 1.4, 0.5, 0);
+      [72, 76, 79, 84, 88, 91].forEach((m, i) => glock(28.05 + i * 0.06, m, 0.5, -0.3 + i * 0.12));
     }
-    bass(T(14, 0), 36, 1.6, 1.1);
 
-    // --- drums ---
-    for (let bar = 0; bar < 14; bar++) {
-      const full = bar >= 1;
-      for (let b = 0; b < 4; b++) {
-        if (bar === 13 && b === 1) continue;
-        if ((b === 0 || b === 2) && (full || b === 2)) kick(T(bar, b), b === 0 ? 1 : 0.85);
-        if ((b === 1 || b === 3) && full) clap(T(bar, b), 1);
-      }
-      if (full && bar % 2 === 1) kick(T(bar, 3.5), 0.55);
-      // shaker 16ths with accents on the off-beats
-      for (let k = 0; k < 16; k++) {
-        const beat = k / 4;
-        shaker(T(bar, beat), (k % 2 ? 1 : 0.55) * (full ? 1 : 0.7));
-      }
-      if (bar >= 6 && bar <= 12) for (const b of [1, 3]) tamb(T(bar, b), 1);
-    }
-    // snare fills into the mix & match section and into the end card
-    for (let k = 0; k < 4; k++) snare(T(9, 3 + k / 4), 0.35 + k * 0.12);
-    for (let k = 0; k < 4; k++) snare(T(12, 1 + k / 4), 0.35 + k * 0.12);
-    crash(25.0, 0.6);
-    crash(28.0, 1.2);
-    kick(28.0, 1.2);
 
-    // --- whistle hook ---
-    const W = [];
-    const phrase = (bar, list) => list.forEach(([beat, m, d, slur]) => W.push({ t: T(bar, beat), m, d: d * BEAT * 0.94, slur }));
-    phrase(1, [[3, 79, 0.5], [3.5, 83, 0.5]]); // pickup
-    phrase(2, [[0, 88, 0.75], [0.75, 86, 0.25, 1], [1, 84, 0.5], [1.5, 88, 0.5], [2, 91, 1.5]]);
-    phrase(3, [[0, 93, 0.5], [0.5, 91, 0.5, 1], [1, 88, 0.5], [1.5, 84, 1.2], [3, 88, 0.5], [3.5, 86, 0.5]]);
-    phrase(4, [[0, 84, 0.5], [0.5, 81, 0.5], [1, 84, 0.5], [1.5, 89, 1.0], [2.5, 88, 0.5, 1], [3, 86, 1]]);
-    phrase(5, [[0, 83, 0.5], [0.5, 86, 0.5], [1, 91, 1.4], [2.5, 89, 0.5], [3, 86, 0.5, 1], [3.5, 83, 0.5]]);
-    phrase(6, [[0, 84, 0.5], [0.5, 88, 0.5], [1, 91, 1.0], [2, 93, 0.5], [2.5, 91, 0.5, 1], [3, 88, 1]]);
-    phrase(7, [[0, 84, 0.5], [0.5, 88, 0.5], [1, 93, 1.4], [2.5, 91, 0.5], [3, 88, 0.5, 1], [3.5, 84, 0.5]]);
-    phrase(8, [[0, 89, 0.5], [0.5, 88, 0.5, 1], [1, 86, 0.5], [1.5, 84, 0.5], [2, 81, 1.0], [3, 84, 0.5], [3.5, 86, 0.5]]);
-    phrase(9, [[0, 86, 1.0], [1, 79, 0.5], [1.5, 83, 0.5], [2, 86, 0.5], [2.5, 89, 0.5], [3, 88, 0.5, 1], [3.5, 86, 0.5]]);
-    phrase(10, [[0, 84, 1.4], [1.5, 81, 0.5], [2, 79, 1.2]]);
-    phrase(13, [[2.5, 88, 0.25], [2.75, 91, 0.25], [3, 93, 0.25], [3.5, 91, 0.5]]);
-    phrase(14, [[0, 84, 2.6]]);
-    // played on a soft vibraphone an octave down (clean, not cartoony)
-    for (const n of W) vibes(n.t, n.m - 12, n.slur ? 0.75 : 0.95);
-
-    // --- marimba riff for mix & match (bars 11–12) ---
-    const ARP = { C: [60, 64, 67, 72], Am: [57, 60, 64, 69], F: [53, 57, 60, 65], G: [55, 59, 62, 67] };
-    for (let bar = 11; bar <= 12; bar++) {
-      for (let k = 0; k < 8; k++) {
-        const beat = k / 2, c = chordAt(bar, beat);
-        const notes = ARP[c] || ARP.C;
-        const m = notes[[0, 2, 1, 3, 2, 1, 3, 2][k]] + 12;
-        marimba(T(bar, beat), m, k % 2 ? 0.7 : 1);
-      }
-    }
-    // a little marimba answer under the beach bars
-    for (const [bar, beat, m] of [[5, 3, 79], [5, 3.5, 76], [6, 3.5, 72], [7, 3, 76], [7, 3.5, 79]]) marimba(T(bar, beat), m, 0.8, 0.3);
-
-    // ================= SOUND CUES (synced to the picture) =================
-    // Deliberately light: paper swishes, soft taps and pitched chimes.
-    const PENTA = [72, 74, 76, 79, 81, 84, 86, 88, 91, 93, 96];
-    const tap = (t, v = 1, p = 0) => slap(t, 0.22 * v, p);
-    const swish = (t, v = 1) => whoosh(t, 0.62, 0.5 * v, 300, 1700, 0.3);
-    // hello: suits pin up, logo writes on, rule draws
-    [0.55, 0.7, 0.85, 1.0, 1.15, 1.3].forEach((t, i) => tap(t + 0.05, 0.9, i % 2 ? 0.4 : -0.4));
-    [84, 88, 91, 93, 96].forEach((m, i) => glock(0.35 + i * 0.28, m, 0.55, -0.2 + i * 0.1));
-    blipNote(2.45, 88, 0.45, 0);
-    // page turns
-    for (const at of [4.0, 10.0, 16.0, 20.0, 25.0]) swish(at - 0.48, 1);
-    // mix & match: card lands, top & bottom drop in, swaps, matching set
-    tap(4.1, 0.7); tap(4.42, 0.9, 0.3); tap(4.57, 0.9, 0.3);
-    const MIX = [[5.5, 76], [6.0, 79], [6.5, 81], [7.0, 79], [7.5, 84], [8.0, 81], [8.5, 86], [8.75, 88]];
-    MIX.forEach(([t, m]) => { whoosh(t - 0.02, 0.3, 0.3, 900, 2600, 0.4); blipNote(t + 0.06, m, 0.5, 0.3); });
-    [88, 91, 96].forEach((m, i) => glock(8.9 + i * 0.08, m, 0.55, 0.3));
-    // the details: each callout dot
-    [11.0, 12.0, 13.0, 14.0].forEach((t, i) => blipNote(t + 0.03, [79, 81, 84, 86][i], 0.6, i % 2 ? -0.3 : 0.3));
-    tap(10.1, 0.8);
-    // sizes: the chips play up the scale
-    for (let i = 0; i < 9; i++) blipNote(16.8 + i * 0.22 + 0.05, PENTA[i + 1], 0.55, -0.4 + i * 0.1);
-    tap(16.25, 0.7, -0.5); tap(16.4, 0.7, 0.5);
-    // why: three cards
-    [20.5, 21.1, 21.7].forEach((t, i) => { tap(t + 0.08, 0.8, (i - 1) * 0.4); glock(t + 0.3, [84, 88, 91][i], 0.35, (i - 1) * 0.4); });
-    // find your fit: suits line up, logo writes on, final chord sparkle
-    for (let i = 0; i < 7; i++) tap(25.25 + i * 0.1 + 0.12, 0.6, -0.45 + i * 0.15);
-    [79, 84, 88, 91].forEach((m, i) => glock(26.0 + i * 0.3, m, 0.45, 0));
-    blipNote(27.25, 84, 0.45, 0);
-    [72, 76, 79, 84, 88, 91, 96].forEach((m, i) => glock(28.02 + i * 0.05, m, 0.6, -0.3 + i * 0.1));
+    if (variant === 'fall') arrangeFall(); else arrangeSummer();
 
     // ================= MASTER =================
     // Freeverb-style reverb on the send bus

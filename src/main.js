@@ -17,7 +17,7 @@
   let actx = null, gain = null, buffer = null, source = null;
   let playing = false, offset = 0, startedAt = 0, perfStart = 0, muted = false;
   let started = false; // until first play, show the poster frame
-  const POSTER_T = 3.4;
+  const POSTER_T = LR.POSTER_T == null ? 3.4 : LR.POSTER_T;
   let soundtrack = null;
 
   // Adaptive resolution: if playback can't hold ~40 fps, render fewer pixels.
@@ -135,7 +135,8 @@
       window.LRExport = {
         duration: DUR,
         frame(t) { draw(t); return true; },
-        soundtrack(sr) { return LR.renderSoundtrack(sr || 48000); },
+        soundtrack(sr) { return LR.renderSoundtrack(sr || 48000, LR.AUDIO); },
+        audio: LR.AUDIO || 'summer',
       };
       document.title = 'ready';
       return;
@@ -152,7 +153,7 @@
     $('hint').textContent = 'Mixing the soundtrack…';
     await new Promise((r) => setTimeout(r, 30));
     try {
-      soundtrack = LR.renderSoundtrack ? LR.renderSoundtrack(48000) : null;
+      soundtrack = LR.renderSoundtrack ? LR.renderSoundtrack(48000, LR.AUDIO) : null;
     } catch (e) { console.warn('Soundtrack failed; continuing silently', e); }
     $('hint').textContent = soundtrack ? 'Play with sound' : 'Play';
 

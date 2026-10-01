@@ -1,5 +1,5 @@
 // Render the synthesized soundtrack to a WAV file (no browser needed):
-//   node tools/render-audio.mjs [out.wav] [sampleRate]
+//   node tools/render-audio.mjs [out.wav] [sampleRate] [variant: summer|fall]
 import { createRequire } from 'node:module';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -11,9 +11,10 @@ const LR = require(join(ROOT, 'src/audio.js'));
 
 const out = process.argv[2] || join(ROOT, 'out/soundtrack.wav');
 const sr = +(process.argv[3] || 48000);
+const variant = process.argv[4] || 'summer';
 const t0 = Date.now();
-const { left, right, sampleRate } = LR.renderSoundtrack(sr);
-console.log(`rendered ${(left.length / sampleRate).toFixed(2)}s in ${Date.now() - t0}ms`);
+const { left, right, sampleRate } = LR.renderSoundtrack(sr, variant);
+console.log(`rendered ${variant} ${(left.length / sampleRate).toFixed(2)}s in ${Date.now() - t0}ms`);
 
 const n = left.length;
 const bufOut = Buffer.alloc(44 + n * 4);

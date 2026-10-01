@@ -6,6 +6,7 @@ A clean, 30-second information video about what makes Lime Ricki unique. It's bu
 - **Reel (9:16):** [`dist/limericki-find-your-fit-reel.mp4`](dist/limericki-find-your-fit-reel.mp4) (1080×1920 for Instagram Reels, TikTok and YouTube Shorts) · cover frame [`dist/reel-cover.jpg`](dist/reel-cover.jpg) · live page `reel.html`
 - **Play live:** open `index.html` in a modern browser. It works offline straight from the file.
   Controls: Space play/pause · R restart · M mute · ←/→ seek.
+- **Fall edition (9:16):** [`dist/limericki-fall-reel.mp4`](dist/limericki-fall-reel.mp4) · cover [`dist/fall-cover.jpg`](dist/fall-cover.jpg) · live page `fall.html` (details below)
 - **Storyboard:** [`dist/storyboard.jpg`](dist/storyboard.jpg) · **Poster:** [`dist/poster.jpg`](dist/poster.jpg)
 - **Earlier version:** the hand-drawn collage cut (v1) lives in [`v1-collage/`](v1-collage/index.html), with its render in [`dist/v1-collage-summer-fun.mp4`](dist/v1-collage-summer-fun.mp4).
 
@@ -19,6 +20,25 @@ A clean, 30-second information video about what makes Lime Ricki unique. It's bu
 | 0:16–0:20 | **03 XXS – 4X** (periwinkle) | *Inclusive sizing for every body, designed so you can feel your best.* | Nine size chips pop in on eighth notes. | The chips play up the scale |
 | 0:20–0:25 | **04 Why Lime Ricki** (cream) | *18+ years of swim* · *Responsibly made* · *Designed in the USA* | Three cards; their line icons draw themselves. | Taps and chimes |
 | 0:25–0:30 | **Find your fit** (petal pink) | White script logo · *FIND YOUR FIT* · *limericki.com* | The one-piece collection lines up under the logo; sparkles land on the final chord. | Logo arpeggio; the final chord rings out |
+
+## Fall edition (9:16 reel)
+
+A seasonal, more playful cut with the same brand system and drawings, plus cut-paper autumn leaves, handwriting (Caveat) and a cozy soundtrack. It lives in `fall.html` and `src/fall/`.
+
+| Time | Scene | On screen |
+|---|---|---|
+| 0:00–0:05 | **Summer's over.** | Swimsuits flutter down like leaves into a pile. "SUMMER'S OVER." gets scribbled out → handwritten *swim season isn't.* |
+| 0:05–0:11 | **Fall break packing list** | A taped notepad whose items write on and tick: cozy sweater ✓, hiking boots ✓, my Lime Ricki suit ✓ (the suit gets paper-clipped on), sunscreen ✓. Note: *UPF 50+ fabric, too!* |
+| 0:11–0:17 | **Hot springs season** | A vintage postcard: fall mountains, evergreens, a steaming spring. The swimsuit is the postage stamp ("UPF 50+"), postmarked *Salt Lake City · UT*. |
+| 0:17–0:22 | **Mix & Match** | Tops and bottoms clothespinned to a twine line, each look on a luggage tag (*hot springs · indoor laps · sunny escape*). One bottom drops away and the matching one clips on. *Tops & bottoms sold separately.* |
+| 0:22–0:26 | **Every body. Every season.** | Facts on giant maple leaves: *XXS – 4X*, *UPF 50+*, *Shelf bra (built-in & double-lined)* |
+| 0:26–0:30 | **swim season, all year.** | Logo writes on over rust paper; suits fan out; Find your fit · limericki.com; a final flurry of leaves on the last chord |
+
+- **Transitions:** every scene change is a gust of leaves. The next page dissolves in behind them through a feathered edge (`TRANSITION_FX.leaves` in `src/fall/leaves.js`).
+- **Palette** (`LR.FALL.colors` in `src/fall/config.js`): oat `#F3EADB`, latte `#E9DCC8`, rust `#B5532A`, pumpkin `#E07A3F`, mustard `#D9A13B`, burgundy `#7A2E2E`, olive `#5E6340`, plus the brand ink and cream.
+- **Sound** (`arrangeFall()` in `src/audio.js`): fingerpicked Karplus–Strong guitar, starting wistful in A minor and brightening at the "swim season isn't" twist. Also bass, a brushed half-time kit and a celesta melody. Cues include a wind bed, leaf-rustle gusts, pencil scribbles and ticks, a stamp thud and clothespin clicks.
+- **Copy** lives in `LR.FALL.copy` (`src/fall/config.js`). The packing list, getaway tags and "hot springs season" are suggested occasions, not product claims. The facts (UPF 50+, built-in shelf bra, XXS–4X, sold separately, Salt Lake City) come from limericki.com.
+- **Render:** `FFMPEG=/path/to/ffmpeg node tools/render-video.mjs --page fall.html` · stills: `node tools/stills.mjs --page fall.html 3.6 14.6`
 
 ## Reel (9:16)
 
@@ -82,6 +102,8 @@ Every frame is a pure function of time, so renders are frame-exact. Add `?t=12.5
 ```
 index.html          player page (16:9)
 reel.html           player page (9:16 reel) — loads src/format-reel.js
+fall.html           fall edition reel — loads src/fall/*
+src/fall/           fall edition: setup, leaves engine + gust transition, config/copy, scenes
 src/brand.js        palette, copy, fonts
 src/logo.js         vector wordmark + write-on reveal
 src/suits.js        illustration loader + die-cut sticker renderer

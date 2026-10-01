@@ -15,6 +15,11 @@
   LR.SCENES = [];
   LR.scene = (id, def) => { LR.SCENES.push(Object.assign({ id }, def)); };
 
+  // Per-film look; a page can override these before its scenes load.
+  LR.FILM = { frame: true, grain: 0.13, vignette: 'rgba(150,110,100,0.14)', overlay: null };
+  // Custom transition renderers by kind: fn(ctx, A, B, t, tr, drawScene)
+  LR.TRANSITION_FX = {};
+
   LR.TRANSITIONS = [
     { at: 4.0, from: 'right', dur: 0.75 },
     { at: 10.0, from: 'right', dur: 0.75 },
@@ -45,7 +50,11 @@
 
     // transition windows start a little before the downbeat and land on it
     const tr = LR.TRANSITIONS.find((x) => t >= x.at - x.dur * 0.55 && t < x.at + x.dur * 0.45);
-    if (tr) {
+    if (tr && tr.kind && LR.TRANSITION_FX[tr.kind]) {
+      const A = LR.SCENES.find((s) => Math.abs(s.end - tr.at) < 1e-6);
+      const B = LR.SCENES.find((s) => Math.abs(s.start - tr.at) < 1e-6);
+      LR.TRANSITION_FX[tr.kind](ctx, A, B, t, tr, drawScene);
+    } else if (tr) {
       const A = LR.SCENES.find((s) => Math.abs(s.end - tr.at) < 1e-6);
       const B = LR.SCENES.find((s) => Math.abs(s.start - tr.at) < 1e-6);
       const k = clamp((t - (tr.at - tr.dur * 0.55)) / tr.dur);
@@ -71,7 +80,8 @@
     } else {
       drawScene(ctx, sceneAt(t), t);
     }
-    cutFrame(ctx, t);
+    if (LR.FILM.frame !== false) cutFrame(ctx, t);
+    if (LR.FILM.overlay) { ctx.save(); LR.FILM.overlay(ctx, t); ctx.restore(); }
     post(ctx);
   }
 
@@ -116,13 +126,13 @@
   function post(ctx) {
     ctx.save();
     ctx.globalCompositeOperation = 'multiply';
-    ctx.globalAlpha = 0.13;
+    ctx.globalAlpha = LR.FILM.grain;
     ctx.fillStyle = LR.tex.grain;
     ctx.fillRect(0, 0, W, H);
     if (!vignette) {
       vignette = ctx.createRadialGradient(W / 2, H / 2, H * 0.45, W / 2, H / 2, H * 1.1);
       vignette.addColorStop(0, 'rgba(255,255,255,0)');
-      vignette.addColorStop(1, 'rgba(150,110,100,0.14)');
+      vignette.addColorStop(1, LR.FILM.vignette);
     }
     ctx.globalAlpha = 1;
     ctx.fillStyle = vignette;

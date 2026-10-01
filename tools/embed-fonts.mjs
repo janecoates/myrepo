@@ -10,6 +10,9 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const fonts = [
   ['Jost', 'jost-latin-400-normal.woff2', '400'],
   ['Jost', 'jost-latin-500-normal.woff2', '500'],
+  ['Jost', 'jost-latin-700-normal.woff2', '700'],
+  ['Caveat', 'caveat-latin-500-normal.woff2', '500'],
+  ['Caveat', 'caveat-latin-700-normal.woff2', '700'],
   ['Poppins', 'poppins-latin-300-normal.woff2', '300'],
   ['Poppins', 'poppins-latin-400-normal.woff2', '400'],
   ['Poppins', 'poppins-latin-500-normal.woff2', '500'],
