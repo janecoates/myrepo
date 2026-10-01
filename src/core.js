@@ -6,6 +6,8 @@
 
   LR.W = 1920;
   LR.H = 1080;
+  // true when rendering the vertical (9:16) reel — see src/format-reel.js
+  LR.tall = () => LR.H > LR.W;
   LR.FPS_BOIL = 12; // "line boil" rate — hand-drawn outlines redraw 12x per second
 
   // ---------- hashing / randomness ----------

@@ -33,25 +33,35 @@
     get bg() { return LR.C.cream; },
     draw(ctx, t) {
       const C = LR.C, B = LR.BRAND.copy;
-      LR.kicker(ctx, B.whyKicker, 960, 170, { t, t0: 20.1, align: 'center' });
-      LR.label(ctx, B.why, 960, 245, { size: 64, weight: 500, tracking: 0.12, upper: true, t, t0: 20.2, stagger: 0.025 });
+      const tall = LR.tall(), mid = LR.W / 2;
+      LR.kicker(ctx, B.whyKicker, mid, tall ? 300 : 170, { t, t0: 20.1, align: 'center' });
+      LR.label(ctx, B.why, mid, tall ? 376 : 245, { size: 64, weight: 500, tracking: 0.12, upper: true, t, t0: 20.2, stagger: 0.025 });
       B.pillars.forEach(([title, body], i) => {
         const t0 = LR.WHY_T0[i];
         const k = E.outBack(clamp((t - t0) / 0.55), 1.2);
         if (k <= 0) return;
-        const x = CARDS[i], y = 620 + (1 - k) * 80;
+        // wide: three upright cards in a row; tall: three landscape cards stacked
+        const x = tall ? mid : CARDS[i], y = (tall ? 650 + i * 290 : 620) + (1 - k) * 80;
+        const cw = tall ? 860 : 410, ch = tall ? 250 : 490;
         ctx.save();
         ctx.globalAlpha = clamp((t - t0) / 0.25);
         LR.setShadow(ctx, { blur: 34, x: 0, y: 16, a: 0.12 });
         ctx.fillStyle = C.white;
-        ctx.beginPath(); LR.trace(ctx, LR.rrectPts(x - 205, y - 245, 410, 490, 24, 6), true, false); ctx.fill();
+        ctx.beginPath(); LR.trace(ctx, LR.rrectPts(x - cw / 2, y - ch / 2, cw, ch, 24, 6), true, false); ctx.fill();
         LR.noShadow(ctx);
         ctx.strokeStyle = 'rgba(150,173,214,.7)'; ctx.lineWidth = 2; ctx.setLineDash([10, 8]);
-        ctx.beginPath(); LR.trace(ctx, LR.rrectPts(x - 187, y - 227, 374, 454, 16, 6), true, false); ctx.stroke();
+        ctx.beginPath(); LR.trace(ctx, LR.rrectPts(x - cw / 2 + 18, y - ch / 2 + 18, cw - 36, ch - 36, 16, 6), true, false); ctx.stroke();
         ctx.restore();
-        icon(ctx, i, x, y - 118, E.inOutCubic(clamp((t - t0 - 0.25) / 0.7)), i === 1 ? C.periwinkle : C.red);
-        LR.label(ctx, title, x, y + 8, { size: 26, weight: 500, tracking: 0.14, upper: true, t, t0: t0 + 0.3, stagger: 0.015 });
-        LR.para(ctx, body, x, y + 78, { size: 25, align: 'center', maxW: 320, t, t0: t0 + 0.45 });
+        const draw = E.inOutCubic(clamp((t - t0 - 0.25) / 0.7)), col = i === 1 ? C.periwinkle : C.red;
+        if (tall) {
+          icon(ctx, i, x - 310, y, draw, col);
+          LR.label(ctx, title, x - 200, y - 46, { size: 28, weight: 500, tracking: 0.14, upper: true, align: 'left', t, t0: t0 + 0.3, stagger: 0.015 });
+          LR.para(ctx, body, x - 200, y + 6, { size: 25, maxW: 560, t, t0: t0 + 0.45 });
+        } else {
+          icon(ctx, i, x, y - 118, draw, col);
+          LR.label(ctx, title, x, y + 8, { size: 26, weight: 500, tracking: 0.14, upper: true, t, t0: t0 + 0.3, stagger: 0.015 });
+          LR.para(ctx, body, x, y + 78, { size: 25, align: 'center', maxW: 320, t, t0: t0 + 0.45 });
+        }
       });
     },
   });

@@ -1,5 +1,6 @@
-// Render the film to MP4 (1920x1080, 30 fps, H.264 + AAC):
-//   FFMPEG=/path/to/ffmpeg node tools/render-video.mjs [out.mp4] [fps]
+// Render the film to MP4 (30 fps, H.264 + AAC):
+//   FFMPEG=/path/to/ffmpeg node tools/render-video.mjs [--reel] [out.mp4] [fps]
+// 16:9 1920x1080 by default; --reel renders the 9:16 1080x1920 cut (reel.html).
 // Frames are rendered frame-exactly in headless Chromium (index.html?export=1);
 // the soundtrack is rendered by the same JS synth in Node.
 import { spawn, execFileSync } from 'node:child_process';
@@ -7,15 +8,17 @@ import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { openFilm, grab, ROOT } from './browser.mjs';
 
-const out = process.argv[2] || join(ROOT, 'out/limericki-find-your-fit.mp4');
-const fps = +(process.argv[3] || 30);
+const reel = process.argv.includes('--reel');
+const args = process.argv.slice(2).filter((a) => a !== '--reel');
+const out = args[0] || join(ROOT, reel ? 'out/limericki-find-your-fit-reel.mp4' : 'out/limericki-find-your-fit.mp4');
+const fps = +(args[1] || 30);
 const ffmpeg = process.env.FFMPEG || 'ffmpeg';
 mkdirSync(join(ROOT, 'out'), { recursive: true });
 
 const wav = join(ROOT, 'out/soundtrack.wav');
 execFileSync(process.execPath, [join(ROOT, 'tools/render-audio.mjs'), wav, '48000'], { stdio: 'inherit' });
 
-const { browser, page } = await openFilm();
+const { browser, page } = await openFilm('export=1', reel ? 'reel.html' : 'index.html');
 const duration = await page.evaluate(() => window.LRExport.duration);
 const frames = Math.round(duration * fps);
 

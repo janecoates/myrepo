@@ -2,7 +2,8 @@
 
 A clean, 30-second information video about what makes Lime Ricki unique. It's built from Lime Ricki's own swimsuit drawings, cut out as paper stickers, plus the script logo, the Jost and Poppins typefaces, and the palette from limericki.com. Everything is plain JavaScript: the canvas draws each frame and the soundtrack is synthesized in code.
 
-- **Watch:** [`dist/limericki-find-your-fit.mp4`](dist/limericki-find-your-fit.mp4) (1920×1080, 30 fps, H.264 + AAC stereo)
+- **Watch (16:9):** [`dist/limericki-find-your-fit.mp4`](dist/limericki-find-your-fit.mp4) (1920×1080, 30 fps, H.264 + AAC stereo)
+- **Reel (9:16):** [`dist/limericki-find-your-fit-reel.mp4`](dist/limericki-find-your-fit-reel.mp4) (1080×1920 for Instagram Reels, TikTok and YouTube Shorts) · cover frame [`dist/reel-cover.jpg`](dist/reel-cover.jpg) · live page `reel.html`
 - **Play live:** open `index.html` in a modern browser. It works offline straight from the file.
   Controls: Space play/pause · R restart · M mute · ←/→ seek.
 - **Storyboard:** [`dist/storyboard.jpg`](dist/storyboard.jpg) · **Poster:** [`dist/poster.jpg`](dist/poster.jpg)
@@ -18,6 +19,20 @@ A clean, 30-second information video about what makes Lime Ricki unique. It's bu
 | 0:16–0:20 | **03 XXS – 4X** (periwinkle) | *Inclusive sizing for every body, designed so you can feel your best.* | Nine size chips pop in on eighth notes. | The chips play up the scale |
 | 0:20–0:25 | **04 Why Lime Ricki** (cream) | *18+ years of swim* · *Responsibly made* · *Designed in the USA* | Three cards; their line icons draw themselves. | Taps and chimes |
 | 0:25–0:30 | **Find your fit** (petal pink) | White script logo · *FIND YOUR FIT* · *limericki.com* | The one-piece collection lines up under the logo; sparkles land on the final chord. | Logo arpeggio; the final chord rings out |
+
+## Reel (9:16)
+
+`reel.html` renders the same film vertically at 1080×1920, with the same timing, soundtrack and sound cues. Each scene has a tall layout (`LAYOUT.tall` in each file in `src/scenes/`):
+
+- Copy and products sit between y ≈ 240 and 1500, clear of the Reels top bar, the like/comment rail on the right and the caption area at the bottom.
+- The tagline breaks onto two lines. The mix & match card stacks under the copy.
+- The detail callouts stack on the right of the suit, so leader lines never cross.
+- Size chips run in two rows. The "Why" cards stack.
+- The end card shows two rows of one-pieces.
+
+Render it with `FFMPEG=/path/to/ffmpeg node tools/render-video.mjs --reel`, and stills with `node tools/stills.mjs --reel 3.4 14.8`.
+
+> Paid Reels placements ask for more room at the bottom (Meta recommends keeping about 35% clear for ads). If this runs as an ad, move the lower content up in the tall layouts.
 
 ## Sources for every claim
 
@@ -65,7 +80,8 @@ Every frame is a pure function of time, so renders are frame-exact. Add `?t=12.5
 ## Files
 
 ```
-index.html          player page
+index.html          player page (16:9)
+reel.html           player page (9:16 reel) — loads src/format-reel.js
 src/brand.js        palette, copy, fonts
 src/logo.js         vector wordmark + write-on reveal
 src/suits.js        illustration loader + die-cut sticker renderer

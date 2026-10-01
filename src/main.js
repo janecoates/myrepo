@@ -23,11 +23,11 @@
   // Adaptive resolution: if playback can't hold ~40 fps, render fewer pixels.
   let quality = 1, slowFrames = 0, lastFrameAt = 0;
   function sizeCanvas() {
-    if (exportMode || stillT != null) { canvas.width = 1920; canvas.height = 1080; return; }
+    if (exportMode || stillT != null) { canvas.width = LR.W; canvas.height = LR.H; return; }
     const r = canvas.getBoundingClientRect();
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const w = Math.max(640, Math.min(1920, Math.round(r.width * dpr * quality)));
-    if (Math.abs(canvas.width - w) > 8) { canvas.width = w; canvas.height = Math.round(w * 9 / 16); }
+    const w = Math.max(360, Math.min(LR.W, Math.round(r.width * dpr * quality)));
+    if (Math.abs(canvas.width - w) > 8) { canvas.width = w; canvas.height = Math.round((w * LR.H) / LR.W); }
   }
   function watchPerf(now) {
     if (playing && lastFrameAt) {
